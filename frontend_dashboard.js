@@ -81,7 +81,7 @@
     <div class="container">
         <h2>Time Study Analysis Tool</h2>
         <div id="taskInputs"></div>
-        <button onclick="initializeTaskInputs()">Add Task Type</button>
+        <button onclick="addTaskInput()">Add Task Type</button>
         <button onclick="calculateROI()" style="margin-top: 10px;">Calculate ROI</button>
         
         <div class="result" id="result"></div>
@@ -96,15 +96,6 @@
     <script>
         let tasks = [];
 
-        function initializeTaskInputs() {
-            let container = document.getElementById("taskInputs");
-            if (!container) {
-                console.error("Error: taskInputs element not found.");
-                return;
-            }
-            addTaskInput();
-        }
-
         function addTaskInput() {
             const container = document.getElementById('taskInputs');
             if (!container) {
@@ -115,7 +106,7 @@
             
             const taskHTML = `
                 <div class="task-group">
-                    <label for="task_type_${index}">Select Task Type:</label>
+                    <label>Task Type:</label>
                     <select id="task_type_${index}">
                         <option value="transaction_matching">Transaction Matching</option>
                         <option value="account_reconciliation">Account Reconciliation</option>
@@ -123,15 +114,15 @@
                         <option value="variance_analysis">Variance Analysis</option>
                         <option value="flux_analysis">Flux Analysis</option>
                     </select>
-                    <label for="preparers_${index}">Number of Preparers:</label>
+                    <label>Number of Preparers:</label>
                     <input type="number" id="preparers_${index}" min="1" required>
-                    <label for="approvers_${index}">Number of Approvers:</label>
+                    <label>Number of Approvers:</label>
                     <input type="number" id="approvers_${index}" min="1" required>
-                    <label for="transactions_${index}">Number of Transactions (per month):</label>
+                    <label>Number of Transactions:</label>
                     <input type="number" id="transactions_${index}" min="1" required>
-                    <label for="manual_time_${index}">Manual Time Per Transaction (minutes):</label>
+                    <label>Manual Time (minutes):</label>
                     <input type="number" id="manual_time_${index}" step="0.1" required>
-                    <label for="hourly_rate_${index}">Hourly Rate ($):</label>
+                    <label>Hourly Rate ($):</label>
                     <input type="number" id="hourly_rate_${index}" step="0.1" required>
                 </div>
             `;
@@ -140,24 +131,36 @@
         }
 
         async function calculateROI() {
+            if (tasks.length === 0) {
+                alert("Please add at least one task before calculating ROI.");
+                return;
+            }
+            const taskData = tasks.map(index => ({
+                task_type: document.getElementById(`task_type_${index}`).value,
+                preparers: parseInt(document.getElementById(`preparers_${index}`).value) || 0,
+                approvers: parseInt(document.getElementById(`approvers_${index}`).value) || 0,
+                transactions: parseInt(document.getElementById(`transactions_${index}`).value) || 0,
+                manual_time: parseFloat(document.getElementById(`manual_time_${index}`).value) || 0,
+                hourly_rate: parseFloat(document.getElementById(`hourly_rate_${index}`).value) || 0
+            }));
+
             try {
                 const response = await fetch("http://localhost:5000/calculate", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ tasks: tasks.map(index => ({
-                        task_type: document.getElementById(`task_type_${index}`).value,
-                        preparers: document.getElementById(`preparers_${index}`).value,
-                        approvers: document.getElementById(`approvers_${index}`).value,
-                        transactions: document.getElementById(`transactions_${index}`).value,
-                        manual_time: document.getElementById(`manual_time_${index}`).value,
-                        hourly_rate: document.getElementById(`hourly_rate_${index}`).value
-                    })) })
+                    body: JSON.stringify({ tasks: taskData })
                 });
                 const data = await response.json();
-                document.getElementById("result").innerHTML = `<p>ROI Calculation Complete! Check Console for Details.</p>`;
-                console.log("ROI Results:", data);
+                document.getElementById("result").innerHTML = data.map(res => `
+                    <p><strong>Task Type:</strong> ${res.task_type}</p>
+                    <p><strong>Time Saved:</strong> ${res.time_saved} hours</p>
+                    <p><strong>Cost Saved:</strong> $${res.cost_saved}</p>
+                    <p><strong>ROI:</strong> ${res.roi}%</p>
+                    <hr>
+                `).join('');
             } catch (error) {
                 console.error("Error calculating ROI:", error);
+                document.getElementById("result").innerHTML = "<p style='color:red;'>Error calculating ROI. Please check console for details.</p>";
             }
         }
     </script>
