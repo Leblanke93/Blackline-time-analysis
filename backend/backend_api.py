@@ -4,13 +4,12 @@ import openai
 import os
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for frontend communication
+CORS(app)
 
 # OpenAI API Key (Replace with your actual key)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 openai.api_key = OPENAI_API_KEY
 
-# Sample benchmark automation time per transaction (minutes)
 BENCHMARK_AUTOMATION_TIMES = {
     "transaction_matching": 1.2,
     "account_reconciliation": 2.5,
@@ -19,7 +18,6 @@ BENCHMARK_AUTOMATION_TIMES = {
     "flux_analysis": 2.0
 }
 
-# ROI Calculation Function
 def calculate_roi(preparers, approvers, transactions, manual_time, hourly_rate, task_type):
     automation_time = BENCHMARK_AUTOMATION_TIMES.get(task_type, manual_time * 0.3)
     
@@ -31,7 +29,6 @@ def calculate_roi(preparers, approvers, transactions, manual_time, hourly_rate, 
 
     return automation_time, time_saved, cost_saved, roi
 
-# ROI Calculation API
 @app.route('/calculate', methods=['POST'])
 def calculate():
     data = request.get_json()
@@ -54,7 +51,6 @@ def calculate():
 
     return jsonify(results), 200
 
-# ChatGPT API Integration
 @app.route('/chat', methods=['POST'])
 def chat():
     data = request.get_json()
