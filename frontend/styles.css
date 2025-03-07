@@ -1,3 +1,26 @@
-.container { max-width: 600px; margin: auto; padding: 20px; }
-.task-group { margin-bottom: 10px; }
-button { background-color: blue; color: white; }
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1f1c2c, #928DAB);
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+}
+
+button {
+    padding: 10px;
+    border-radius: 20px;
+    background: #ff758c;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
