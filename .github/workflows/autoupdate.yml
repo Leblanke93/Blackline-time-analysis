@@ -1,0 +1,30 @@
+name: Auto-Update from ChatGPT
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install Dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Commit & Push Changes
+        run: |
+          git config --global user.email "chatgpt-bot@example.com"
+          git config --global user.name "ChatGPT Auto-Commit"
+          git add .
+          git commit -m "Auto-update from ChatGPT"
+          git push
