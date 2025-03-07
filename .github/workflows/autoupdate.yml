@@ -6,6 +6,9 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: write  # Allows the workflow to commit changes
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -19,12 +22,18 @@ jobs:
           python-version: "3.9"
 
       - name: Install Dependencies
-        run: pip install -r backend/requirements.txt
+        run: |
+          if [ -f backend/requirements.txt ]; then
+            pip install -r backend/requirements.txt
+          fi
 
-      - name: Commit & Push Changes
+      - name: Configure Git
         run: |
           git config --global user.email "chatgpt-bot@example.com"
           git config --global user.name "ChatGPT Auto-Commit"
+
+      - name: Commit & Push Changes
+        run: |
           git add .
-          git commit -m "Auto-update from ChatGPT"
-          git push
+          git commit -m "Auto-update from ChatGPT" || echo "No changes to commit"
+          git push origin main || echo "No changes to push"
