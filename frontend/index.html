@@ -22,6 +22,33 @@
             <p id="chatResponse"></p>
         </div>
     </div>
-    <script src="script.js"></script>
+    <script>
+        function addTaskInput() {
+            const container = document.getElementById("taskInputs");
+            const index = container.children.length;
+            
+            container.innerHTML += `
+                <div class="task-group">
+                    <label>Task Type:</label>
+                    <select id="task_type_${index}">
+                        <option value="transaction_matching">Transaction Matching</option>
+                        <option value="account_reconciliation">Account Reconciliation</option>
+                    </select>
+                    <label>Number of Preparers:</label>
+                    <input type="number" id="preparers_${index}" required>
+                    <label>Manual Time Per Transaction (minutes):</label>
+                    <input type="number" id="manual_time_${index}" required>
+                </div>
+            `;
+        }
+
+        function calculateROI() {
+            document.getElementById("result").innerText = "ROI Calculation Placeholder";
+        }
+
+        function askChatGPT() {
+            document.getElementById("chatResponse").innerText = "ChatGPT Response Placeholder";
+        }
+    </script>
 </body>
 </html>
