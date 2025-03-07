@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-import numpy as np
 import os
 
 app = Flask(__name__)
@@ -61,37 +60,41 @@ def calculate_roi(preparers, approvers, transactions, manual_time, hourly_rate, 
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
-    data = request.get_json()
-    results = []
-    
-    for task in data.get("tasks", []):
-        automation_time, time_saved, cost_saved, roi = calculate_roi(
-            int(task["preparers"]),
-            int(task["approvers"]),
-            int(task["transactions"]),
-            float(task["manual_time"]),
-            float(task["hourly_rate"]),
-            task["task_type"]
-        )
+    try:
+        data = request.get_json()
+        if not data or "tasks" not in data:
+            return jsonify({"error": "Invalid request format"}), 400
         
-        new_calculation = ROICalculation(
-            task_type=task["task_type"],
-            preparers=int(task["preparers"]),
-            approvers=int(task["approvers"]),
-            transactions=int(task["transactions"]),
-            manual_time=float(task["manual_time"]),
-            automation_time=automation_time,
-            hourly_rate=float(task["hourly_rate"]),
-            time_saved=time_saved,
-            cost_saved=cost_saved,
-            roi=roi
-        )
-        db.session.add(new_calculation)
-        db.session.commit()
-
-        results.append(new_calculation.to_dict())
-    
-    return jsonify(results), 200
+        results = []
+        for task in data.get("tasks", []):
+            automation_time, time_saved, cost_saved, roi = calculate_roi(
+                int(task.get("preparers", 0)),
+                int(task.get("approvers", 0)),
+                int(task.get("transactions", 0)),
+                float(task.get("manual_time", 0)),
+                float(task.get("hourly_rate", 0)),
+                task.get("task_type", "unknown")
+            )
+            
+            new_calculation = ROICalculation(
+                task_type=task.get("task_type", "unknown"),
+                preparers=int(task.get("preparers", 0)),
+                approvers=int(task.get("approvers", 0)),
+                transactions=int(task.get("transactions", 0)),
+                manual_time=float(task.get("manual_time", 0)),
+                automation_time=automation_time,
+                hourly_rate=float(task.get("hourly_rate", 0)),
+                time_saved=time_saved,
+                cost_saved=cost_saved,
+                roi=roi
+            )
+            db.session.add(new_calculation)
+            db.session.commit()
+            results.append(new_calculation.to_dict())
+        
+        return jsonify(results), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     with app.app_context():
