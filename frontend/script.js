@@ -25,26 +25,35 @@ async function calculateROI() {
         preparers: document.getElementById("preparers_0").value,
         manual_time: document.getElementById("manual_time_0").value
     }];
-    
-    const response = await fetch(`${API_URL}/calculate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tasks })
-    });
-    
-    const data = await response.json();
-    document.getElementById("result").innerText = `ROI: ${data[0].roi}%`;
+
+    try {
+        const response = await fetch(`${API_URL}/calculate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tasks })
+        });
+        const data = await response.json();
+        document.getElementById("result").innerText = `ROI: ${data[0].roi}%`;
+    } catch (error) {
+        console.error("Error calculating ROI:", error);
+        alert("Error calculating ROI. Check the console for details.");
+    }
 }
 
 async function askChatGPT() {
     const message = document.getElementById("chatInput").value;
     
-    const response = await fetch(`${API_URL}/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message })
-    });
+    try {
+        const response = await fetch(`${API_URL}/chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        });
 
-    const data = await response.json();
-    document.getElementById("chatResponse").innerText = data.response;
+        const data = await response.json();
+        document.getElementById("chatResponse").innerText = data.response;
+    } catch (error) {
+        console.error("Error with ChatGPT API:", error);
+        alert("Error connecting to ChatGPT API. Check the console for details.");
+    }
 }
