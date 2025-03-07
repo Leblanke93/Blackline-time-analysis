@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # Allows the workflow to commit changes
+  contents: write  # Ensures GitHub Actions has permission to push changes
 
 jobs:
   update:
@@ -15,22 +15,16 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-
-      - name: Set Up Python
-        uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Dependencies
-        run: |
-          if [ -f backend/requirements.txt ]; then
-            pip install -r backend/requirements.txt
-          fi
-
-      - name: Configure Git
+      - name: Set Up Git
         run: |
           git config --global user.email "chatgpt-bot@example.com"
           git config --global user.name "ChatGPT Auto-Commit"
+
+      - name: Make Sure Repo is Up to Date
+        run: git pull origin main --rebase
 
       - name: Commit & Push Changes
         run: |
