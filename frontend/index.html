@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Study Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Time Study Analysis</h2>
+        <div id="taskInputs"></div>
+        <button onclick="addTaskInput()">Add Task Type</button>
+        <button onclick="calculateROI()">Calculate ROI</button>
+        
+        <div class="result" id="result"></div>
+
+        <div class="chat-container">
+            <h3>ChatGPT Assistance</h3>
+            <input type="text" id="chatInput" placeholder="Ask a question...">
+            <button onclick="askChatGPT()">Ask</button>
+            <p id="chatResponse"></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
